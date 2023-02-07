@@ -1,0 +1,17 @@
+{
+	"name": "querySsonData",
+	"properties": {
+		"content": {
+			"query": "-- Nested json query\nSELECT TOP 10\n     JSON_VALUE ([jsonContent], '$[0].id') AS [id]\n    ,JSON_VALUE ([jsonContent], '$[0].username') AS [username]\n    ,JSON_VALUE ([jsonContent], '$[0].email') AS [email]\n    ,[address].[city]\n    ,[address].[zipcode]   \n    \nFROM\n    OPENROWSET(\n        BULK 'https://traininglabdp203.dfs.core.windows.net/testing1242files/jsonFiles/users.json',\n        FORMAT = 'CSV',\n        FIELDQUOTE = '0x0b',\n        FIELDTERMINATOR ='0x0b',\n        ROWTERMINATOR = '0x0b'\n    )\n    WITH (\n        [jsonContent] varchar(MAX)\n        ) as [result]\n    CROSS APPLY OPENJSON    \n    (JSON_QUERY([jsonContent], '$[0].address'))\n    WITH (\n        [city] varchar(MAX) '$.city',\n        [zipcode] varchar(MAX) '$.zipcode'        \n    ) as [address]\n",
+			"metadata": {
+				"language": "sql"
+			},
+			"currentConnection": {
+				"databaseName": "master",
+				"poolName": "Built-in"
+			},
+			"resultLimit": 5000
+		},
+		"type": "SqlQuery"
+	}
+}
